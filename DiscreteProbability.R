@@ -99,3 +99,13 @@ numOfNatural21/nrow(blackJackDF)
 #We have 4 Ace and 16 of '10' or face cards, so that we have 16 * 4 case of natural 21
 #Then, probability is:
 16 * 4 / choose(52, 2)
+
+#Another simple way:
+#We take care of 2 cases:
+# - Ace in first card
+# - Ace in second card
+#Then we add them together by logic OR
+mean((blackJack[, 1] %in% c("A Diamonds", "A Hearts", "A Clubs", "A Spades") & 
+      blackJack[, 2] %in% favorableCardsOfB) |
+     (blackJack[, 1] %in% favorableCardsOfB &
+      blackJack[, 2] %in% c("A Diamonds", "A Hearts", "A Clubs", "A Spades")))
