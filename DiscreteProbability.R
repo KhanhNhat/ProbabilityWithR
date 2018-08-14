@@ -31,6 +31,71 @@ deckCards = str_c(deckCardsDF$number, deckCardsDF$suit, sep = ' ')
 #Therefore, it is also probability of picking an Ace
 mean(deckCards %in% c("A Diamonds", "A Hearts", "A Clubs", "A Spades"))
 
+#Now, use permutation() and combination() functions from gtool package to simulation probability
+#Calculate a probability of get a '10' or face card after picked an Ace
+#We do not use mathematic formulation but we use R to simulate
+#In this case, order is matter, so that we use permutation() to create all of possible of getting 2 cards
+handOf2Cards = permutations(52, 2, deckCards)
 
+#Result is a matrix of all possible of getting 2 cards from the deck
+#Let take a look of the first of six
+head(handOf2Cards)
 
+#Get all possible of first cards
+firstCards = handOf2Cards[, 1]
 
+#And second cards
+secondCards = handOf2Cards[, 2]
+
+#Let A is an event of getting an Ace of the first card
+#Probability of A is 1/13 = 0.0769
+p_A = mean(firstCards %in% c("A Diamonds", "A Hearts", "A Clubs", "A Spades"))
+
+#Let B is an event of getting a '10' or face cards of the second card
+favorableCardsOfB_DF = expand.grid(number = c('10', 'J', 'Q', 'K'), suit = suits)
+favorableCardsOfB = str_c(favorableCardsOfB_DF$number, favorableCardsOfB_DF$suit, sep = ' ')
+
+#We need to calculate this probability of getting a '10' or face cards after picking an Ace
+#It means we need to find P(B|A)
+#And we have P(B|A) = P(B and A)/P(A)
+#We already have P(A), we need P(B and A)
+#Event of B and A happends when we have Ace in first card, '10' or face cards in second card at the same time
+#It is calculated by:
+p_BandA = mean((firstCards %in% c("A Diamonds", "A Hearts", "A Clubs", "A Spades")) & #first is an Ace
+               (secondCards %in% favorableCardsOfB))                                  # and second is 10 or face cards   
+
+#Therefore, P(B|A) is:
+p_BgivenA = p_BandA/p_A
+
+#Let check with mathematic
+#After picking one card, we have 51 cards left
+#We have 16 cards of '10' and face cards
+#So, the probability of picking one of them at the second cards is: 16/51
+#Use identical() to check p_BgivenA is exactly 16/51
+identical(p_BgivenA, 16/51)
+
+#What happend if order is not matter?
+#Calculate a probability of getting natural 21 in Black Jack?
+#In Black Jack, we get natural 21 when we have an Ace and one of 10 or face cards
+#Which card comes first is not matter
+#In this case, we use combination to create all of collection of 2 cards from the deck
+blackJack = combinations(52, 2, deckCards)
+
+#Now, we need to count how many case of natural 21 appear
+#Create a dataframe
+blackJackDF = data.frame(blackJack)
+blackJackDF$X1 = as.character(blackJackDF$X1)
+blackJackDF$X2 = as.character(blackJackDF$X2)
+
+#Find how many of natural 21 appeards in this dataframe:
+numOfNatural21 = blackJackDF %>% unite('Collection', c('X1', 'X2')) %>%
+                                 filter(str_detect(Collection, '[1JQK]') &       #Have '10' or face cards
+                                        str_count(Collection, 'A') == 1) %>%     #Must have only one Ace
+                                 nrow()
+#Therefore, probability is
+numOfNatural21/nrow(blackJackDF)
+
+#Compare with mathematic
+#We have 4 Ace and 16 of '10' or face cards, so that we have 16 * 4 case of natural 21
+#Then, probability is:
+16 * 4 / choose(52, 2)
