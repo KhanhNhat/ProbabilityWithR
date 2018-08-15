@@ -1,4 +1,5 @@
 library(tidyverse)
+library(gtools)
 
 
 #Discrete Probability with R
@@ -80,6 +81,7 @@ identical(p_BgivenA, 16/51)
 #Which card comes first is not matter
 #In this case, we use combination to create all of collection of 2 cards from the deck
 blackJack = combinations(52, 2, deckCards)
+head(blackJack)
 
 #Now, we need to count how many case of natural 21 appear
 #Create a dataframe
@@ -109,3 +111,35 @@ mean((blackJack[, 1] %in% c("A Diamonds", "A Hearts", "A Clubs", "A Spades") &
       blackJack[, 2] %in% favorableCardsOfB) |
      (blackJack[, 1] %in% favorableCardsOfB &
       blackJack[, 2] %in% c("A Diamonds", "A Hearts", "A Clubs", "A Spades")))
+
+
+#Run Monte Carlo simulation for birthday problem
+#Calculate probability of having at least 1 duplicated birthday in a group of n people
+#We use duplicated() to check if an element of a vector is duplicated or not
+#Result of this function is a logical vector which has same length with input vector
+#It is FALSE if an element is distinct
+#It is TRUE at the second, third, ... position of duplicated value
+#For example:
+#duplicated(c(1, 2, 3, 1, 1, 4, 2, 5))
+#[1] FALSE FALSE FALSE  TRUE  TRUE FALSE  TRUE FALSE
+#And any() function that return TRUE if at least one TRUE in input vector
+
+#Let n = 30
+n = 30
+birthdaySimulation = replicate(N, any(duplicated(sample(1:365, n, replace = TRUE))))
+
+#Therefore, approximate probability is:
+mean(birthdaySimulation)
+
+#Now compare with mathematical way
+#With n people, we have 365^n possible birthday
+#We calculate a chance of no duplicated birthday is:
+#First one has:   365
+#Second one has:  364
+#Third one has:   363
+#.................
+#Upto nth person: (365 - n + 1)
+#Probability is: prod(365 - n + 1:365)/(365^n)
+#Complement of above probability is what we need
+1 - prod((365-n+1):365)/(365^n)
+
