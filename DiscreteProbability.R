@@ -143,3 +143,33 @@ mean(birthdaySimulation)
 #Complement of above probability is what we need
 1 - prod((365-n+1):365)/(365^n)
 
+#Now let simulate a medical case:
+#There is a medical test machine with accuracy is 99%.
+#It means that if patient is positive, it result test is positive in 99% of all case.
+#There is only 1% of a whole country population is possitive with this disease.
+#If a person has a positive result, what is a probability that he is really sick?
+
+#Create a model for a medical test machine:
+medicalTest = function(patient){
+  if (patient == 'positive'){
+    return(sample(c('positive', 'negative'), size = 1, prob = c(0.99, 0.01)))
+    } else if (patient == 'negative'){
+    return(sample(c('negative', 'positive'), size = 1, prob = c(0.99, 0.01)))
+    } else
+      return('NA')
+}
+
+#Now we apply Rule of Large Number to get a aproximately probability
+#We do this for 100 times
+probs = replicate(100, {
+                        patientPop = sample(c('positive', 'negative'), size = 10000, replace = TRUE, prob = c(0.01, 0.99))
+                        medicalResult = sapply(patientPop, medicalTest)
+                        sum(medicalResult == 'positive' & patientPop == 'positive')/sum(medicalResult == 'positive')
+                        })
+
+#With Central Limit Theorem, we will have:
+meanProb = mean(probs)
+sdProb = sd(probs)
+
+#True probability is meanProb +/- 2*sdProb with confidence level is 95%
+#From 0.4256 - 0.5771
