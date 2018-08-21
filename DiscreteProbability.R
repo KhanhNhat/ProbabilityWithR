@@ -168,8 +168,11 @@ probs = replicate(100, {
                         })
 
 #With Central Limit Theorem, we will have:
+#True value of probability is close to this
 meanProb = mean(probs)
-sdProb = sd(probs)
+
+#Standard deviation is equal this sd/sqrt(N)
+sdProb = sd(probs)/10
 
 #True probability is meanProb +/- 2*sdProb with confidence level is 95%
-#From 0.4256 - 0.5771
+#From 0.4938 - 0.5089
