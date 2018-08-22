@@ -16,7 +16,7 @@ maleHeightCDF(65)
 qplot(x = maleHeights, col = I('white'), xlab = 'Male Heigh Distribution')
 
 #And how is eCDF look like:
-maleHeightProb = sapply(seq(min(maleHeights), max(maleHeights), length = 100), maleHeightCDF)
+maleHeightProb = sapply(seq(floor(min(maleHeights)), ceiling(max(maleHeights)), by = 1), maleHeightCDF)
 
-qplot(x = seq(min(maleHeights), max(maleHeights), length = 100), y = maleHeightProb, col = I('tan1'),
+qplot(x = seq(floor(min(maleHeights)), ceiling(max(maleHeights)), by = 1), y = maleHeightProb, col = I('tan1'),
       xlab = 'Male Height', ylab = 'Cumulative Probability')
